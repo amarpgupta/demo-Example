@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <title>hello-backbonejs</title>
+  </head>
+  <body>
+    <h1>Welcome To Backbone Tutorial</h1>
+    <script src="jquery-1.7.1.min.js"></script>
+    <script src="underscore-min.js"></script>
+    <script src="backbone-min.js"></script>
+    <form id="modelForm">
+      <label>Name</label><input id="modelName" name="modelName" type="text">
+      <label>Status</label><input id="modelStatus" name="modelStatus" type="text">
+      <button>post</button>
+    </form>
+    <hr/>
+<div id="modelDiv"></div>
+<div id="modelDiv1"></div>
+    <script>
+    (function($){
+
+
+      var Model = Backbone.Model.extend({
+        defaults:function(){
+          return {
+            name:'',
+            status:''
+
+          }
+        }
+        
+
+    });
+     
+    var modelList=Backbone.Collection.extend({
+      model:Model
+    });
+
+    var models=new modelList();
+
+    
+   // var model2=new Model({name:'Amar2',status:2});
+   // var model3=new Model({name:'Amar3',status:3});
+   
+
+
+ var modelView=Backbone.View.extend({
+    model:new Model(),
+    tagName:'div',
+    initialize: function(){
+
+      this.template=_.template($('#modelTemp').html());
+    },
+    render:function(){
+      this.$el.html(this.template(this.model.toJSON()));
+      return this;
+    }
+
+
+ });
+ 
+
+
+ var modelViews=Backbone.View.extend({
+      model:models,
+      el:$('#modelDiv'),
+      initialize:function(){
+        this.model.on('add',this.render,this);
+      },
+      render:function(){
+        var self=this;
+        self.$el.html('');
+        _.each(this.model.toArray(),function(model,i){
+          self.$el.append((new modelView({model:model})).render().$el);
+
+        });
+        return this;
+
+      }
+
+ });
+$(document).ready(function(){
+      $('#modelForm').submit(function(ev){
+        //alert('hh '+$('#modelName').val());
+        var model1=new Model({name:$('#modelName').val(),status:$('#modelStatus').val()});
+
+        models.add(model1);//alert('hh '+models);
+        console.log(models.toJSON());
+        
+        
+        return false;
+       
+      });
+      
+       var modelsNView=new modelViews();
+});
+
+    })(jQuery);
+
+    
+
+
+</script>
+
+<script type="text/template" id="modelTemp">
+<span class="modName"><%= name %>:</span>
+      <span class="modStatus"><%= status %></span>
+
+
+</script>
+
+
+
+
+
+
+
+    																																												
+  </body>
+  </html>
